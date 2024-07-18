@@ -55,14 +55,14 @@ func main() {
 	talent.Use(m.JwtTalentAuthMiddleware())
 	talent.GET("/jobs/", handler.GetJobs)
 	talent.GET("/jobs/:id", handler.GetJob)
-	talent.GET("/applications/", handler.GetApplications)
+	talent.GET("/applications/:id", handler.GetApplication)
 	talent.GET("/applications/:talent_id", handler.GetApplicationsByTalentID)
 	talent.POST("/applications/", handler.CreateApplication)
 
 	// both party
 	both := e.Group("")
 	both.Use(m.JwtAuthMiddleware())
-	both.GET("/applications/:id", handler.GetApplication)
+	both.GET("/applications/", handler.GetApplications)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

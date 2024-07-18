@@ -1,8 +1,6 @@
 package repo
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo/v4"
 	"github.com/triwira-joel/technical-test-bosshire/db"
 	d "github.com/triwira-joel/technical-test-bosshire/domain"
@@ -40,6 +38,16 @@ func (r *Repo) CreateUser(c echo.Context, name string, role string, email string
 	return newUser, nil
 }
 
+func (r *Repo) GetUserByEmailAndPassword(c echo.Context, email, password string) (*d.User, error) {
+	user, err := r.db.SelectUserByEmailAndPassword(email, password)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (r *Repo) GetUsers(c echo.Context) ([]*d.User, error) {
 	users, err := r.db.SelectUsers()
 	if err != nil {
@@ -62,7 +70,6 @@ func (r *Repo) CreateJob(c echo.Context, name string, description string, employ
 	newJob := d.NewJob(name, description, employer_id)
 
 	if err := r.db.CreateJob(newJob); err != nil {
-		fmt.Println(err.Error())
 		return nil, err
 	}
 
@@ -71,7 +78,6 @@ func (r *Repo) CreateJob(c echo.Context, name string, description string, employ
 
 func (r *Repo) GetJob(c echo.Context, id int) (*d.Job, error) {
 	job, err := r.db.SelectJobByID(id)
-	fmt.Println("REPO: ", id)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +105,6 @@ func (r *Repo) GetApplications(c echo.Context) ([]*d.Application, error) {
 
 func (r *Repo) GetApplication(c echo.Context, id int) (*d.Application, error) {
 	application, err := r.db.SelectApplicationByID(id)
-	fmt.Println("-- MASUK REPO --")
 	if err != nil {
 		return nil, err
 	}
@@ -129,7 +134,6 @@ func (r *Repo) CreateApplication(c echo.Context, job_id, talent_id, employer_id 
 	newApplication := d.NewApplication(job_id, talent_id, employer_id, string(d.Review))
 
 	if err := r.db.CreateApplication(newApplication); err != nil {
-		fmt.Println(err.Error())
 		return nil, err
 	}
 
@@ -145,7 +149,6 @@ func (r *Repo) UpdateApplicationStatus(c echo.Context, id int, status string) (*
 	application.Status = status
 
 	if err := r.db.UpdateApplicationStatus(application); err != nil {
-		fmt.Println(err.Error())
 		return nil, err
 	}
 

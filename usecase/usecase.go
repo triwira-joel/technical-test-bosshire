@@ -1,10 +1,9 @@
 package usecase
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo/v4"
 	d "github.com/triwira-joel/technical-test-bosshire/domain"
+	"github.com/triwira-joel/technical-test-bosshire/helper"
 	repo "github.com/triwira-joel/technical-test-bosshire/repo"
 )
 
@@ -28,12 +27,32 @@ func (u *UseCase) GetUser(c echo.Context, id int) (*d.User, error) {
 	return user, nil
 }
 
-func (u *UseCase) CreateUser(c echo.Context, name string, role string, email string, password string) (*d.User, error) {
+func (u *UseCase) CreateUser(c echo.Context, name string, role string, email string, password string) (string, error) {
 	user, err := u.repo.CreateUser(c, name, role, email, password)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	return user, nil
+
+	jwt, err := helper.CreateJWTToken(user)
+	if err != nil {
+		return "", err
+	}
+
+	return jwt, nil
+}
+
+func (u *UseCase) Login(c echo.Context, email, password string) (string, error) {
+	user, err := u.repo.GetUserByEmailAndPassword(c, email, password)
+	if err != nil {
+		return "", err
+	}
+
+	jwt, err := helper.CreateJWTToken(user)
+	if err != nil {
+		return "", err
+	}
+
+	return jwt, nil
 }
 
 func (u *UseCase) GetUsers(c echo.Context) ([]*d.User, error) {
@@ -62,7 +81,6 @@ func (u *UseCase) CreateJob(c echo.Context, name string, description string, emp
 
 func (u *UseCase) GetJob(c echo.Context, id int) (*d.Job, error) {
 	job, err := u.repo.GetJob(c, id)
-	fmt.Println("USECASE :", id)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +105,6 @@ func (u *UseCase) GetApplications(c echo.Context) ([]*d.Application, error) {
 
 func (u *UseCase) GetApplication(c echo.Context, id int) (*d.Application, error) {
 	application, err := u.repo.GetApplication(c, id)
-	fmt.Println("-- MASUK USECASE --")
 	if err != nil {
 		return nil, err
 	}

@@ -1,11 +1,14 @@
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 type CreateUserRequest struct {
-	Name  string `json:"name"`
-	Role  string `json:"role"`
-	Email string `json:"email"`
+	Name     string `json:"name"`
+	Role     string `json:"role"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 type User struct {
@@ -13,14 +16,19 @@ type User struct {
 	Name      string    `json:"name"`
 	Role      string    `json:"role"`
 	Email     string    `json:"email"`
+	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
-func NewUser(name, role, email string) *User {
+func NewUser(name, role, email string, password string) *User {
 	return &User{
 		Name:      name,
 		Role:      role,
 		Email:     email,
+		Password:  password,
 		CreatedAt: time.Now().UTC(),
 	}
 }
+
+// TODO
+func EncryptPassword() {}

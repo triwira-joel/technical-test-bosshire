@@ -51,6 +51,7 @@ func main() {
 	employer.PUT("/applications/:id", handler.UpdateApplicationStatus)
 	employer.GET("/users/:id", handler.GetUser)
 
+	// talent only
 	talent := e.Group("/talent")
 	talent.Use(m.JwtTalentAuthMiddleware())
 	talent.GET("/jobs/", handler.GetJobs)

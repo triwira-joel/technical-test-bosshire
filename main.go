@@ -9,6 +9,7 @@ import (
 	"github.com/triwira-joel/technical-test-bosshire/config"
 	"github.com/triwira-joel/technical-test-bosshire/db"
 	h "github.com/triwira-joel/technical-test-bosshire/handler"
+	m "github.com/triwira-joel/technical-test-bosshire/middleware"
 	"github.com/triwira-joel/technical-test-bosshire/repo"
 	"github.com/triwira-joel/technical-test-bosshire/usecase"
 )
@@ -28,31 +29,40 @@ func main() {
 
 	e := echo.New()
 
-	u := e.Group("/users")
-	j := e.Group("/jobs")
-	a := e.Group("/applications")
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	// public
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	u.GET("/:id", handler.GetUser)
-	u.GET("/", handler.GetUsers)
-	u.POST("/", handler.CreateUser)
+	e.POST("/login", handler.Login)
+	e.POST("/signup", handler.Signup)
 
-	j.GET("/", handler.GetJobs)
-	j.GET("/:id", handler.GetJob)
-	j.GET("/:employer_id", handler.GetJobsByEmployerID)
-	j.POST("/", handler.CreateJob)
+	e.GET("/users/", handler.GetUsers)
 
-	a.GET("/", handler.GetApplications)
-	a.GET("/:id", handler.GetApplication)
-	a.GET("/:talent_id", handler.GetApplicationsByTalentID)
-	a.GET("/:employer_id", handler.GetJobsByEmployerID)
-	a.POST("/", handler.CreateApplication)
-	a.PUT("/:id", handler.UpdateApplicationStatus)
+	// employer only
+	employer := e.Group("/employer")
+	employer.Use(m.JwtEmployerAuthMiddleware())
+	employer.GET("/jobs/:employer_id", handler.GetJobsByEmployerID)
+	employer.POST("/jobs", handler.CreateJob)
+	employer.GET("/applications/:employer_id", handler.GetApplicationsByEmployerID)
+	employer.PUT("/applications/:id", handler.UpdateApplicationStatus)
+	employer.GET("/users/:id", handler.GetUser)
+
+	talent := e.Group("/talent")
+	talent.Use(m.JwtTalentAuthMiddleware())
+	talent.GET("/jobs/", handler.GetJobs)
+	talent.GET("/jobs/:id", handler.GetJob)
+	talent.GET("/applications/", handler.GetApplications)
+	talent.GET("/applications/:talent_id", handler.GetApplicationsByTalentID)
+	talent.POST("/applications/", handler.CreateApplication)
+
+	// both party
+	both := e.Group("")
+	both.Use(m.JwtAuthMiddleware())
+	both.GET("/applications/:id", handler.GetApplication)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }

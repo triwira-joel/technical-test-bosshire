@@ -53,7 +53,12 @@ func (hdl *HTTPHandler) GetUser(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
 
-	return c.JSON(http.StatusOK, user)
+	resp := domain.GetUserResponse{
+		Name:  user.Name,
+		Email: user.Email,
+	}
+
+	return c.JSON(http.StatusOK, resp)
 }
 
 func (hdl *HTTPHandler) Login(c echo.Context) error {

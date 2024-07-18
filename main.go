@@ -37,19 +37,19 @@ func main() {
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
-	e.POST("/login", handler.Login)
-	e.POST("/signup", handler.Signup)
+	e.POST("/login", handler.Login)   // LOGIN
+	e.POST("/signup", handler.Signup) // SIGNUP
 
-	e.GET("/users/", handler.GetUsers)
+	e.GET("/users/", handler.GetUsers) // TO SHOW ALL USERS
 
 	// employer only
 	employer := e.Group("/employer")
 	employer.Use(m.JwtEmployerAuthMiddleware())
-	employer.GET("/jobs/:employer_id", handler.GetJobsByEmployerID)
-	employer.POST("/jobs", handler.CreateJob)
-	employer.GET("/applications/:employer_id", handler.GetApplicationsByEmployerID)
-	employer.PUT("/applications/:id", handler.UpdateApplicationStatus)
-	employer.GET("/users/:id", handler.GetUser)
+	employer.GET("/jobs/:employer_id", handler.GetJobsByEmployerID)                     // LIST OF POSTED JOBS
+	employer.POST("/jobs", handler.CreateJob)                                           // CREATE JOB POST
+	employer.GET("/applications/all/:employer_id", handler.GetApplicationsByEmployerID) // GET APPLICATIONS OF ALL EMPLOYER POSTED JOBS
+	employer.PUT("/applications/:id", handler.UpdateApplicationStatus)                  // UPDATE APPLICATION STATUS
+	employer.GET("/users/:id", handler.GetUser)                                         // GET USER DETAIL FROM APPLICATION
 
 	// talent only
 	talent := e.Group("/talent")
@@ -57,7 +57,7 @@ func main() {
 	talent.GET("/jobs/", handler.GetJobs)
 	talent.GET("/jobs/:id", handler.GetJob)
 	talent.GET("/applications/:id", handler.GetApplication)
-	talent.GET("/applications/:talent_id", handler.GetApplicationsByTalentID)
+	talent.GET("/applications/all/:talent_id", handler.GetApplicationsByTalentID)
 	talent.POST("/applications/", handler.CreateApplication)
 
 	// both party

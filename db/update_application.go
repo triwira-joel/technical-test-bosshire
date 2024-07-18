@@ -5,11 +5,9 @@ import (
 )
 
 func (s *DBHandler) UpdateApplicationStatus(a *domain.Application) error {
-	query := `
-		UPDATE applications status = $1, 
-			WHERE id = $2;`
+	query := `UPDATE applications SET status = $1 WHERE id = $2;`
 
-	_, err := s.DB.Exec(query, a.JobID, a.TalentID, a.EmployerID, a.Status, a.CreatedAt)
+	_, err := s.DB.Exec(query, a.Status, a.ID)
 	if err != nil {
 		return err
 	}

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -23,7 +22,7 @@ func NewHttpHandler(
 	}
 }
 
-func (hdl *HTTPHandler) CreateUser(c echo.Context) error {
+func (hdl *HTTPHandler) Signup(c echo.Context) error {
 	createUserReq := new(domain.CreateUserRequest)
 	err := json.NewDecoder(c.Request().Body).Decode(createUserReq)
 	if err != nil {
@@ -34,11 +33,12 @@ func (hdl *HTTPHandler) CreateUser(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "Role does not exist")
 	}
 
-	user, err := hdl.uc.CreateUser(c, createUserReq.Name, createUserReq.Role, createUserReq.Email, createUserReq.Password)
+	token, err := hdl.uc.CreateUser(c, createUserReq.Name, createUserReq.Role, createUserReq.Email, createUserReq.Password)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
-	return c.JSON(http.StatusOK, user)
+
+	return c.JSON(http.StatusOK, token)
 }
 
 func (hdl *HTTPHandler) GetUser(c echo.Context) error {
@@ -54,6 +54,21 @@ func (hdl *HTTPHandler) GetUser(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, user)
+}
+
+func (hdl *HTTPHandler) Login(c echo.Context) error {
+	loginReq := new(domain.LoginRequest)
+	err := json.NewDecoder(c.Request().Body).Decode(loginReq)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, err.Error())
+	}
+
+	token, err := hdl.uc.Login(c, loginReq.Email, loginReq.Password)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return c.JSON(http.StatusOK, token)
 }
 
 func (hdl *HTTPHandler) GetUsers(c echo.Context) error {
@@ -110,8 +125,6 @@ func (hdl *HTTPHandler) GetJobsByEmployerID(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	fmt.Println(id)
-
 	jobs, err := hdl.uc.GetJobsByEmployerID(c, id)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
@@ -136,10 +149,7 @@ func (hdl *HTTPHandler) GetApplication(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
 
-	fmt.Println(id)
-
 	application, err := hdl.uc.GetApplication(c, id)
-	fmt.Println("-- HANDLER MASUK --")
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, err.Error())
 	}
@@ -153,8 +163,6 @@ func (hdl *HTTPHandler) GetApplicationsByEmployerID(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-
-	fmt.Println(id)
 
 	applications, err := hdl.uc.GetApplicationsByEmployerID(c, id)
 	if err != nil {
@@ -170,8 +178,6 @@ func (hdl *HTTPHandler) GetApplicationsByTalentID(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-
-	fmt.Println(id)
 
 	applications, err := hdl.uc.GetApplicationsByTalentID(c, id)
 	if err != nil {
@@ -201,8 +207,6 @@ func (hdl *HTTPHandler) UpdateApplicationStatus(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, err.Error())
 	}
-
-	fmt.Println(id)
 
 	updateApplicationReq := new(domain.UpdateApplicationRequest)
 	err = json.NewDecoder(c.Request().Body).Decode(updateApplicationReq)

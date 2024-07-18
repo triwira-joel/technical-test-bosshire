@@ -16,6 +16,7 @@ func (s *DBHandler) SelectUsers() ([]*domain.User, error) {
 			&user.Name,
 			&user.Role,
 			&user.Email,
+			&user.Password,
 			&user.CreatedAt,
 		)
 

@@ -1,0 +1,26 @@
+package db
+
+import (
+	"fmt"
+
+	"github.com/triwira-joel/technical-test-bosshire/domain"
+)
+
+func (s *DBHandler) SelectApplicationByID(id int) (*domain.Application, error) {
+	var application domain.Application
+
+	fmt.Println("--MASUK DB--")
+
+	err := s.DB.QueryRow(`SELECT * FROM applications WHERE id = $1;`, id).Scan(
+		&application.ID,
+		&application.JobID,
+		&application.TalentID,
+		&application.EmployerID,
+		&application.Status,
+		&application.CreatedAt,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &application, nil
+}

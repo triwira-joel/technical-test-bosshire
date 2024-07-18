@@ -12,6 +12,7 @@ func (s *DBHandler) SelectUserByID(id int) (*domain.User, error) {
 		&user.Name,
 		&user.Role,
 		&user.Email,
+		&user.Password,
 		&user.CreatedAt,
 	)
 	if err != nil {

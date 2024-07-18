@@ -16,7 +16,19 @@ type DBHandler struct {
 }
 
 func (s *DBHandler) InitDB() error {
-	return s.CreateUserTable()
+	err := s.CreateUsersTable()
+	if err != nil {
+		return err
+	}
+	err = s.CreateJobsTable()
+	if err != nil {
+		return err
+	}
+	err = s.CreateApplicationsTable()
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func ConnectDB(cnf *config.Config) *DBHandler {

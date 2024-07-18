@@ -5,6 +5,7 @@ import (
 	d "github.com/triwira-joel/technical-test-bosshire/domain"
 	"github.com/triwira-joel/technical-test-bosshire/helper"
 	repo "github.com/triwira-joel/technical-test-bosshire/repo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UseCase struct {
@@ -28,7 +29,15 @@ func (u *UseCase) GetUser(c echo.Context, id int) (*d.User, error) {
 }
 
 func (u *UseCase) CreateUser(c echo.Context, name string, role string, email string, password string) (string, error) {
-	user, err := u.repo.CreateUser(c, name, role, email, password)
+	encryptedPassword, err := bcrypt.GenerateFromPassword(
+		[]byte(password),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	user, err := u.repo.CreateUser(c, name, role, email, string(encryptedPassword))
 	if err != nil {
 		return "", err
 	}
@@ -42,8 +51,12 @@ func (u *UseCase) CreateUser(c echo.Context, name string, role string, email str
 }
 
 func (u *UseCase) Login(c echo.Context, email, password string) (string, error) {
-	user, err := u.repo.GetUserByEmailAndPassword(c, email, password)
+	user, err := u.repo.GetUserByEmail(c, email)
 	if err != nil {
+		return "", err
+	}
+
+	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)) != nil {
 		return "", err
 	}
 

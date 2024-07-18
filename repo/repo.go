@@ -48,6 +48,16 @@ func (r *Repo) GetUserByEmailAndPassword(c echo.Context, email, password string)
 	return user, nil
 }
 
+func (r *Repo) GetUserByEmail(c echo.Context, email string) (*d.User, error) {
+	user, err := r.db.SelectUserByEmail(email)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
 func (r *Repo) GetUsers(c echo.Context) ([]*d.User, error) {
 	users, err := r.db.SelectUsers()
 	if err != nil {

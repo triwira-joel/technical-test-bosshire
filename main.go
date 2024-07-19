@@ -54,16 +54,16 @@ func main() {
 	// talent only
 	talent := e.Group("/talent")
 	talent.Use(m.JwtTalentAuthMiddleware())
-	talent.GET("/jobs/", handler.GetJobs)
-	talent.GET("/jobs/:id", handler.GetJob)
-	talent.GET("/applications/:id", handler.GetApplication)
-	talent.GET("/applications/all/:talent_id", handler.GetApplicationsByTalentID)
-	talent.POST("/applications/", handler.CreateApplication)
+	talent.GET("/jobs/", handler.GetJobs)                                         // LIST OF ALL JOBS
+	talent.GET("/jobs/:id", handler.GetJob)                                       // GET JOB DETAIL
+	talent.GET("/applications/:id", handler.GetApplication)                       // GET APPLICATION DETAIL
+	talent.GET("/applications/all/:talent_id", handler.GetApplicationsByTalentID) // GET ALL APPLICATIONS FROM THE TALENT ID
+	talent.POST("/applications/", handler.CreateApplication)                      // CREATE APPLICATION
 
 	// both party
 	both := e.Group("")
 	both.Use(m.JwtAuthMiddleware())
-	both.GET("/applications/", handler.GetApplications)
+	both.GET("/applications/", handler.GetApplications) // TO SHOW ALL APPLICATIONS
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
